@@ -1,8 +1,9 @@
+
 ---
 
 # 📝 Notion Clone
 
-A **Notion-inspired web app** built with [Next.js](https://nextjs.org), Firebase, and TailwindCSS.
+A **Notion-inspired web app** built with [Next.js](https://nextjs.org), **Clerk Authentication**, Firebase, and TailwindCSS.
 This project replicates core features of Notion such as **document editing, workspace management, and real-time sync** – all powered by modern web technologies.
 
 ---
@@ -10,7 +11,8 @@ This project replicates core features of Notion such as **document editing, work
 ## 🚀 Features
 
 * ⚡ **Next.js 14** with App Router
-* 🔥 **Firebase Authentication & Firestore** for real-time sync
+* 🔑 **Clerk Authentication** (Google, GitHub, Email, etc.)
+* 🔥 **Firebase Firestore** for real-time sync & data storage
 * 🎨 **TailwindCSS + Geist Font** for modern UI
 * 🗒️ Notion-like **document editor** (blocks, markdown-style editing)
 * 🌙 Dark & Light mode
@@ -21,7 +23,8 @@ This project replicates core features of Notion such as **document editing, work
 ## 📦 Tech Stack
 
 * **Frontend** → Next.js (App Router)
-* **Backend** → Firebase (Auth + Firestore)
+* **Auth** → Clerk
+* **Database** → Firebase Firestore
 * **UI** → TailwindCSS + Shadcn/UI + Geist Font
 * **State Management** → React hooks & Context API
 
@@ -56,9 +59,14 @@ Copy the `.env.example` file to `.env.local`:
 cp .env.example .env.local
 ```
 
-Update `.env.local` with your **Firebase configuration values**:
+Update `.env.local` with your **Clerk & Firebase configuration values**:
 
 ```env
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+# Firebase Firestore
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
@@ -66,6 +74,8 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
+
+> 📝 You can find your Clerk keys in the [Clerk Dashboard](https://dashboard.clerk.com).
 
 ### 4. Run the development server
 
@@ -87,15 +97,17 @@ Open [http://localhost:3000](http://localhost:3000) 🚀
 
 ```bash
 notion-clone/
-├── app/                 # Next.js App Router pages
+├── app/                 
 │   ├── layout.tsx       # Root layout
 │   ├── page.tsx         # Homepage
 │   └── dashboard/       # Workspace dashboard
 ├── components/          # Reusable UI components
-├── lib/                 # Firebase config & utilities
+├── lib/                 
+│   ├── clerk.ts         # Clerk auth config
+│   ├── firebase.ts      # Firebase config
 ├── styles/              # TailwindCSS styles
 ├── public/              # Static assets
-├── .env.example         # Environment variable template
+├── .env.example         # Env variable template
 ├── package.json
 └── README.md
 ```
@@ -105,21 +117,20 @@ notion-clone/
 ## 📚 Learn More
 
 * [Next.js Documentation](https://nextjs.org/docs) – Next.js features & API
-* [Firebase Docs](https://firebase.google.com/docs) – Firebase setup & usage
+* [Clerk Docs](https://clerk.com/docs) – Authentication setup & usage
+* [Firebase Docs](https://firebase.google.com/docs) – Firestore integration
 * [TailwindCSS Docs](https://tailwindcss.com/docs) – Styling reference
 
 ---
 
 ## 🚀 Deployment
 
-The easiest way to deploy this app is with [Vercel](https://vercel.com), the creators of Next.js.
+The easiest way to deploy this app is with [Vercel](https://vercel.com).
 
 1. Push your repo to GitHub
-2. Import the repo into [Vercel Dashboard](https://vercel.com/new)
-3. Add your environment variables in the project settings
+2. Import into [Vercel Dashboard](https://vercel.com/new)
+3. Add your **Clerk** + **Firebase** environment variables in Vercel settings
 4. Deploy 🎉
-
-For more details, check [Next.js Deployment Guide](https://nextjs.org/docs/app/building-your-application/deploying).
 
 ---
 
@@ -137,7 +148,7 @@ Contributions are always welcome!
 
 ## 📜 License
 
-This project is licensed under the **MIT License**. Feel free to use and modify for your own projects.
+This project is licensed under the **MIT License**.
 
 ---
 
