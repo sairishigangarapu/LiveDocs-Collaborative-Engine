@@ -1,7 +1,6 @@
 "use client";
 import { MenuIcon } from "lucide-react";
 import NewDocumentButton from "./NewDocumentButton";
-//import SidebarOption from "./SidebarOption";
 import {
     Sheet,
     SheetContent,
@@ -9,92 +8,128 @@ import {
     SheetTitle,
     SheetTrigger,
   } from "@/components/ui/sheet"
-import {useCollection} from "react-firebase-hooks/firestore"
 import { useUser } from "@clerk/nextjs";
-import { collectionGroup, query, where ,DocumentData} from "firebase/firestore";
-import {db} from "@/firebase";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import SidebarOption from "./SidebarOption";
+import { getUserDocuments } from "@/actions/actions";
 
-interface RoomDocument extends DocumentData{
-    createdAt : string;
-    role: "owner"|"editor";
-    roomID : string;
-    userID : string;
+interface UserDocument {
+    id: string;
+    userId: string;
+    role: "owner" | "editor";
+    createdAt: Date;
+    roomID: string;
+    title?: string;
 }
 
 function Sidebar() {
-    const {user}=useUser();
+    const { user } = useUser();
+    const [documents, setDocuments] = useState<UserDocument[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const fetchingRef = useRef(false);
 
-    const[groupedData,setGroupedData]=useState<{ owner: RoomDocument[]; editor: RoomDocument[] }>(
-        {
-            owner: [],
-            editor: [],
-        }
-    );
-
-    const [data,loading,error] = useCollection(
-        user &&(
-            query(collectionGroup(db,'rooms'),
-            where('userId','==',user.emailAddresses[0].toString()))
-        )
-    );
     useEffect(() => {
-        if (!data) return;
-
-        const grouped = data.docs.reduce<{ owner: RoomDocument[]; editor: RoomDocument[] }>(
-            (acc, curr) => {
-                const roomData = curr.data() as RoomDocument;
-                if (roomData.role === "owner") {
-                    acc.owner.push({
-                        id:curr.id,
-                        ...roomData,
-                    });
-                } else if (roomData.role === "editor") {
-                    acc.editor.push({
-                        id:curr.id,
-                        ...roomData,
-                    });
+        const fetchDocuments = async () => {
+            if (!user?.id || fetchingRef.current) return;
+            
+            console.log('🔍 Sidebar useEffect triggered - user:', user?.id);
+            fetchingRef.current = true;
+            setLoading(true);
+            setError(null);
+            
+            try {
+                const result = await getUserDocuments();
+                if (result.success && result.documents) {
+                    setDocuments(result.documents);
+                    console.log('✅ Documents loaded in sidebar:', result.documents);
+                } else {
+                    setError(result.error || "Failed to load documents");
+                    console.error('❌ Failed to load documents:', result.error);
                 }
-                return acc;
-            },
-            { owner: [], editor: [] }
-        );
-        setGroupedData(grouped)
-    }, [data]);
-    const Menuoptions =(
+            } catch (error) {
+                console.error('❌ Error fetching documents:', error);
+                setError("Failed to load documents. Please try again.");
+            } finally {
+                setLoading(false);
+                fetchingRef.current = false;
+            }
+        };
+
+        fetchDocuments();
+    }, [user?.id]); // Only depend on user ID, not the entire user object
+
+    // Group documents by role
+    const groupedData = {
+        owner: documents.filter(doc => doc.role === "owner"),
+        editor: documents.filter(doc => doc.role === "editor")
+    };
+    const Menuoptions = (
         <div className="flex flex-col gap-y-4 w-full">
             <div className="w-full">
                 <NewDocumentButton />
             </div>
-            <div className="flex flex-col gap-y-2 w-full">
-                {/*My docs */}
-                {groupedData.owner.length === 0 ? (
-                    <h2 className="text-gray-500 font-semibold text-sm">No Documents Found</h2>
-                ) : (
-                    <>
-                        <h2 className="text-gray-500 font-semibold text-sm">My Documents</h2>
-                        <div className="flex flex-col gap-y-2 w-full">
-                            {groupedData.owner.map((doc) => (
-                                <SidebarOption key={doc.id} id={doc.id} href={`/doc/${doc.id}`} />
-                            ))}
-                        </div>
-                    </>
-                )}
-            </div>
-            {/*List.... */}
-            {/*Shared with me*/}
-            {groupedData.editor.length > 0 &&(
-                <>
-                    <h2 className="text-gray-500 font-semibold text-sm">No Documents Found</h2>
-                    <div className="flex flex-col gap-y-2 w-full">
-                        {groupedData.owner.map((doc) => (
-                            <SidebarOption key={doc.id} id={doc.id} href={`/doc/${doc.id}`} />
-                        ))}
+            
+            {loading ? (
+                <div className="flex flex-col gap-y-2 w-full">
+                    <div className="animate-pulse">
+                        <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                        <div className="h-8 bg-gray-300 rounded mb-2"></div>
+                        <div className="h-8 bg-gray-300 rounded"></div>
                     </div>
+                </div>
+            ) : error ? (
+                <div className="flex flex-col gap-y-2 w-full">
+                    <h2 className="text-red-500 font-semibold text-sm">Error Loading Documents</h2>
+                    <p className="text-gray-500 text-xs">{error}</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="text-blue-500 text-xs hover:underline"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            ) : (
+                <>
+                    <div className="flex flex-col gap-y-2 w-full">
+                        {/*My docs */}
+                        {groupedData.owner.length === 0 ? (
+                            <h2 className="text-gray-500 font-semibold text-sm">No Documents Found</h2>
+                        ) : (
+                            <>
+                                <h2 className="text-gray-500 font-semibold text-sm">My Documents</h2>
+                                <div className="flex flex-col gap-y-2 w-full">
+                                    {groupedData.owner.map((doc) => (
+                                        <SidebarOption 
+                                            key={doc.id} 
+                                            id={doc.roomID} 
+                                            href={`/doc/${doc.roomID}`}
+                                            title={doc.title}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    
+                    {/*Shared with me*/}
+                    {groupedData.editor.length > 0 && (
+                        <>
+                            <h2 className="text-gray-500 font-semibold text-sm">Shared with me</h2>
+                            <div className="flex flex-col gap-y-2 w-full">
+                                {groupedData.editor.map((doc) => (
+                                    <SidebarOption 
+                                        key={doc.id} 
+                                        id={doc.roomID} 
+                                        href={`/doc/${doc.roomID}`}
+                                        title={doc.title}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </>
             )}
-            {/*List.... */}
         </div>
     )
     return (

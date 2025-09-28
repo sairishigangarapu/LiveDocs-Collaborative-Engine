@@ -1,6 +1,7 @@
 "use client";
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { ReactNode } from 'react'
+import { Button } from './ui/button'
 
 interface HeaderProps {
     children?: ReactNode
@@ -20,7 +21,9 @@ function Header({children, className }: HeaderProps) {
             {/* Breadcrumbs */}
             <div>
                 <SignedOut>
-                    <SignInButton>Sign In</SignInButton>
+                    <SignInButton>
+                        <Button>Sign In</Button>
+                    </SignInButton>
                 </SignedOut>
                 <SignedIn>
                     <UserButton/>

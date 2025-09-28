@@ -1,4 +1,5 @@
-import Document from '@/components/Document';
+import Document from "@/components/Document";
+import { Suspense } from "react";
 
 interface DocumentPageProps {
   params: {
@@ -6,10 +7,19 @@ interface DocumentPageProps {
   };
 }
 
-export default function DocumentPage({ params }: DocumentPageProps) {
+export default async function DocumentPage({ params }: DocumentPageProps) {
+  const { id } = await params;
+  
   return (
     <div>
-      <Document id={params.id} />
+      <Suspense fallback={<div>Loading document...</div>}>
+        <DocumentWrapper id={id} />
+      </Suspense>
     </div>
   );
+}
+
+// Client component wrapper to ensure params is properly handled
+function DocumentWrapper({ id }: { id: string }) {
+  return <Document id={id} />;
 }
