@@ -1,0 +1,15 @@
+[2024-12-19 10:30:45] ERROR: BreadCrumbs.tsx - Syntax Error
+Cannot find name 'segment'. Did you mean 'segments'?
+Location: components/BreadCrumbs.tsx:23
+Issue: Missing parentheses around arrow function parameters in map function
+Original code: {segments.map(segment,index)=>{
+Fixed code: {segments.map((segment,index)=>{{
+Status: RESOLVED - Added parentheses around parameters
+
+[2024-12-19 10:31:12] ERROR: BreadCrumbs.tsx - Bracket Error  
+Missing closing parenthesis for map function
+Location: components/BreadCrumbs.tsx:31
+Issue: map function not properly closed
+Original code: }}
+Fixed code: })}
+Status: RESOLVED - Added missing closing parenthesis

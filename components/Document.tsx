@@ -16,7 +16,7 @@ function Document({ id }: DocumentProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { isSignedIn, isLoaded, userId } = useAuth();
-
+    //const isOwner = useOwner();
     // Fetch document data using server action
     useEffect(() => {
         const fetchDocument = async () => {

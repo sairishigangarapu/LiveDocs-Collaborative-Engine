@@ -2,6 +2,7 @@
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { ReactNode } from 'react'
 import { Button } from './ui/button'
+import BreadCrumbs from './BreadCrumbs';
 
 interface HeaderProps {
     children?: ReactNode
@@ -19,6 +20,7 @@ function Header({children, className }: HeaderProps) {
             }
             {children}
             {/* Breadcrumbs */}
+            <BreadCrumbs/>
             <div>
                 <SignedOut>
                     <SignInButton>
