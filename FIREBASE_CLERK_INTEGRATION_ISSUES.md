@@ -201,6 +201,71 @@ if (!userId || !sessionClaims?.email) {
 
 ---
 
+## Issue #6: Liveblocks Authorization 403 from `/auth-endpoint`
+
+### Error Message
+```
+POST /auth-endpoint 403
+{"message":"You are not in this room"}
+```
+
+### Root Cause
+- **Membership Check Path Mismatch**: The server checked membership with a collection group query against `rooms` by `userId`, but room membership is stored under `users/{email}/rooms/{roomID}`.
+- **Identifier Mismatch**: Clerk session identifies users by email for room membership, while the query used `userId` and `collectionGroup`, causing false negatives.
+
+### Solution Applied
+**Align membership check with storage schema and Clerk session**:
+```typescript
+// app/auth-endpoint/route.ts (AFTER)
+const userEmail = String((sessionClaims as any)?.email ?? '');
+const roomDoc = await adminDB
+  .collection("users")
+  .doc(userEmail)
+  .collection("rooms")
+  .doc(room)
+  .get();
+
+if (roomDoc.exists) {
+  session.allow(room, session.FULL_ACCESS);
+  const { body, status } = await session.authorize();
+  return new Response(body, { status });
+}
+```
+
+### Key Learning
+- **Use the same identifier** across systems (email vs uid) for joins/authorization.
+- **Query Firestore according to your data model**; avoid broad `collectionGroup` if a direct path exists.
+
+---
+
+## Issue #7: Liveblocks Secret Env Var Typo Causing Init Error
+
+### Error Message
+```
+Error: LIVEBLOCKS_SECRET_KEY (or LIVEBLOCKS_PRIVATE_KEY) is not set
+at lib/liveblocks.ts:6:11
+```
+
+### Root Cause
+- **Environment Variable Typo**: Code referenced `process.env.LIVEBLOCKS_PRIATE_KEY` (misspelled), so the secret was never read even when set.
+
+### Solution Applied
+**Fix env var name and keep backward-compatible fallback**:
+```typescript
+// lib/liveblocks.ts (AFTER)
+const secretKey = process.env.LIVEBLOCKS_SECRET_KEY || process.env.LIVEBLOCKS_PRIVATE_KEY;
+
+if (!secretKey) {
+  throw new Error("LIVEBLOCKS_SECRET_KEY (or LIVEBLOCKS_PRIVATE_KEY) is not set");
+}
+```
+
+### Key Learning
+- **Validate env names** carefully; a single typo breaks initialization.
+- **Support multiple variable names** during migrations to minimize downtime.
+
+---
+
 ## Architecture Changes Summary
 
 ### BEFORE (Problematic)

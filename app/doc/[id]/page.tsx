@@ -2,9 +2,9 @@ import Document from "@/components/Document";
 import { Suspense } from "react";
 
 interface DocumentPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function DocumentPage({ params }: DocumentPageProps) {
