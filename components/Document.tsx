@@ -4,6 +4,13 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { useAuth } from '@clerk/nextjs';
 import { getDocument, updateDocument } from '@/actions/actions';
+import Editor from './Editor';
+import useOwner from '@/lib/useOwner';
+import DeleteDocument from './DeleteDocument';
+import InviteUser from './InviteUser';
+import ManageUsers from './ManageUsers';
+import Avatars from './Avatars';
+
 
 
 interface DocumentProps {
@@ -16,7 +23,7 @@ function Document({ id }: DocumentProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { isSignedIn, isLoaded, userId } = useAuth();
-    //const isOwner = useOwner();
+    const isOwner = useOwner();
     // Fetch document data using server action
     useEffect(() => {
         const fetchDocument = async () => {
@@ -29,7 +36,9 @@ function Document({ id }: DocumentProps) {
                 const result = await getDocument(id);
                 if (result.success && result.data) {
                     setInput(result.data.title || "");
-                    console.log('✅ Document loaded successfully:', result.data);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('✅ Document loaded successfully');
+                    }
                 } else {
                     setError(result.error || "Failed to load document");
                     console.error('❌ Failed to load document:', result.error);
@@ -45,15 +54,17 @@ function Document({ id }: DocumentProps) {
         fetchDocument();
     }, [id, isLoaded]);
 
-    // Debug authentication state
+    // Debug authentication state (only in development)
     useEffect(() => {
-        console.log('🔍 Authentication Debug:', {
-            isSignedIn,
-            isLoaded,
-            userId,
-            isLoading,
-            error
-        });
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🔍 Authentication Debug:', {
+                isSignedIn,
+                isLoaded,
+                userId,
+                isLoading,
+                error
+            });
+        }
     }, [isSignedIn, isLoaded, userId, isLoading, error]);
 
     const updateTitle = (e: FormEvent) => {
@@ -125,7 +136,7 @@ function Document({ id }: DocumentProps) {
     }
 
     return (
-        <div className="flex flex-col max-w-6xl mx-auto justify-between pb-5">
+        <div className="flex flex-col max-w-6xl mx-auto justify-between pb-5 flex-1 h-full bg-white p-5">
             <form onSubmit={updateTitle} className="flex flex-1 flex-row items-center gap-2">
                 {/* Update title */}
                 <div className="flex-grow">
@@ -134,14 +145,33 @@ function Document({ id }: DocumentProps) {
                 <Button disabled={isUpdating} type="submit">
                     {isUpdating ? "Updating" : "Update"}
                 </Button>
-                {/* IF */}
-                {/* isOwner && invite and delete */}
+                {/* Debug ownership status */}
+                {/* <div className="text-xs text-gray-500">
+                    Owner: {isOwner ? 'Yes' : 'No'}
+                </div> */}
+                
+                {/* Show delete button only for owners */}
+                {isOwner && (
+                    <>
+                    {/*Inviting a user */}
+                    <InviteUser/>
+                    {/*Deleting a document */}
+                    <DeleteDocument />
+                    </>
+                )}
+                {/* Non-owners can only view and edit */}
             </form>
-            <div className="mt-6">
+            <div className="mt-6 flex max-w-6-xl mx-auto justify-between item-center mb-5">
                 {/* ManageUsers */}
+                <ManageUsers/>
                 {/* Avatars */}
+                <Avatars/>
             </div>
             {/* Collaborative Editor */}
+            <div>
+                <hr className='pb-10'/>
+                <Editor/>
+            </div>
         </div>
     );
 }

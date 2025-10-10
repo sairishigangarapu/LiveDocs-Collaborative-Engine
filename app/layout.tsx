@@ -6,6 +6,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
+import { Toaster } from 'sonner'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -31,13 +32,15 @@ export default function RootLayout({
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <Header className="flex justify-end items-center p-4 gap-4 h-16"/>
-          <div className='flex min-h-screen'>
+          <div className='flex h-[calc(100vh-4rem)]'>
             {/*Sidebar */}
             <Sidebar/>
             <div className='flex-1 p-4 bg-gray-100 overflow-y-auto scrollbar-hide'>
           {children}
             </div>
           </div>
+
+          <Toaster/>
         </body>
       </html>
     </ClerkProvider>

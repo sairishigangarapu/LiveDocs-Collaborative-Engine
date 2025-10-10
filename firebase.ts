@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+
 // Your web app's Firebase configuration from environment variables
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,7 +11,36 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
 
-export{db};
+// Initialize Firebase app
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+// Initialize Firestore with better error handling and persistence
+let db: ReturnType<typeof getFirestore>;
+
+try {
+    // Check if this is the first initialization
+    const apps = getApps();
+    if (apps.length === 1) {
+        try {
+            // Try to initialize with persistence settings
+            db = initializeFirestore(app, {
+                localCache: persistentLocalCache({
+                    tabManager: persistentMultipleTabManager()
+                })
+            });
+        } catch (persistenceError) {
+            // If persistence initialization fails, use default
+            console.warn('Persistence initialization failed, using default Firestore:', persistenceError);
+            db = getFirestore(app);
+        }
+    } else {
+        db = getFirestore(app);
+    }
+} catch (error) {
+    console.error('Error initializing Firestore:', error);
+    // Fallback to default initialization
+    db = getFirestore(app);
+}
+
+export { db };

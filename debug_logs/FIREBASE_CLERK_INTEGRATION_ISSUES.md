@@ -98,6 +98,48 @@ Classes or null prototypes are not supported.
 ### Solution Applied
 **Created Data Conversion Function**:
 ```typescript
+
+---
+
+## Issue #4: Users Not Rendering in Dialog
+
+### Error Message
+No explicit error, but users were not being displayed in the ManageUsers dialog despite being present in the database.
+
+### Root Cause
+- **Firestore Query Issues**: The collectionGroup query for users with access to a document was not returning results
+- **Missing Fallback Handling**: No fallback mechanism when Firestore data is unavailable
+- **Conditional Rendering**: The component only showed users when the Firestore query returned results
+
+### Solution Applied
+**Added Fallback User Data and Improved Rendering Logic**:
+```typescript
+// Added fallback users array for when Firestore query fails
+const fallbackUsers = [
+  { userId: currentUserEmail, role: 'owner' }
+];
+
+// Updated rendering logic to use fallback data when needed
+{(usersInRoom?.docs && usersInRoom.docs.length > 0) ? (
+  // Use data from Firestore collection
+  usersInRoom.docs.map((doc) => {
+    // Render user from Firestore
+  })
+) : currentUserEmail ? (
+  // Use fallback data when Firestore collection is empty
+  fallbackUsers.map((userData, index) => {
+    // Render fallback user
+  })
+) : (
+  <p>No users with access yet.</p>
+)}
+```
+
+### Key Learning
+- **Always provide fallback data** when relying on external data sources
+- **Add debugging code** to identify issues with data fetching
+- **Handle empty states gracefully** in UI components
+- **Consider edge cases** where expected data might be missing
 function convertFirestoreData(data: any): any {
     // Handle Firestore Timestamps
     if (data && typeof data === 'object' && data.constructor.name === 'Timestamp') {

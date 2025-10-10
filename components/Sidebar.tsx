@@ -33,7 +33,6 @@ function Sidebar() {
         const fetchDocuments = async () => {
             if (!user?.id || fetchingRef.current) return;
             
-            console.log('🔍 Sidebar useEffect triggered - user:', user?.id);
             fetchingRef.current = true;
             setLoading(true);
             setError(null);
@@ -42,7 +41,9 @@ function Sidebar() {
                 const result = await getUserDocuments();
                 if (result.success && result.documents) {
                     setDocuments(result.documents);
-                    console.log('✅ Documents loaded in sidebar:', result.documents);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('✅ Documents loaded in sidebar:', result.documents.length);
+                    }
                 } else {
                     setError(result.error || "Failed to load documents");
                     console.error('❌ Failed to load documents:', result.error);
@@ -133,7 +134,7 @@ function Sidebar() {
         </div>
     )
     return (
-    <div className="p-2 md:p-5 bg-gray-200 relative h-full min-h-screen flex flex-col w-[300px] md:w-[340px]">
+    <div className="p-2 md:p-5 bg-gray-200 relative h-full flex flex-col w-[300px] md:w-[340px] overflow-y-auto">
             <div className="md:hidden">
                 <Sheet  >
                     <SheetTrigger>
@@ -147,7 +148,7 @@ function Sidebar() {
                     </SheetContent>
                 </Sheet>
             </div>
-            <div className="hidden md:flex flex-col w-full h-full">
+            <div className="hidden md:flex flex-col w-full">
                 {Menuoptions}
             </div>
         </div>
