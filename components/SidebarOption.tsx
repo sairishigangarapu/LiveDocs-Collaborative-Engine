@@ -9,7 +9,7 @@ type SidebarOptionProps = {
   title?: string;
 };
 
-function SidebarOption({ href, id, title }: SidebarOptionProps) {
+function SidebarOption({ href, title }: SidebarOptionProps) {
 const pathname = usePathname();
 const isActive = href.includes(pathname) && pathname !== "/";
 

@@ -3,21 +3,29 @@ import liveblocks from "@/lib/liveblocks";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
+interface SessionClaims {
+	fullName?: string;
+	email?: string;
+	image?: string;
+}
+
 export async function POST(req:NextRequest) {
 	auth.protect();
 	const { userId, sessionClaims } = await auth();
 	const {room} = await req.json();
 
+	const claims = sessionClaims as SessionClaims;
+
 	const session = liveblocks.prepareSession(userId ?? 'anonymous',{
 		userInfo :{
-			name : (sessionClaims as any)?.fullName || 'Anonymous User',
-			email : String((sessionClaims as any)?.email ?? ''),
-			avatar : String((sessionClaims as any)?.image ?? ''),
+			name : claims?.fullName || 'Anonymous User',
+			email : String(claims?.email ?? ''),
+			avatar : String(claims?.image ?? ''),
 		}
 	});
 
 	// Match how rooms are stored: users/{email}/rooms/{roomID}
-	const userEmail = String((sessionClaims as any)?.email ?? '');
+	const userEmail = String(claims?.email ?? '');
 	if (!userEmail) {
 		return NextResponse.json(
 			{ message: "Missing user email in session" },

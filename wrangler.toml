@@ -1,0 +1,17 @@
+# Cloudflare Pages configuration for Notion Clone
+
+name = "notion-clone"
+compatibility_date = "2025-10-11"
+
+# Pages configuration
+pages_build_output_dir = ".vercel/output/static"
+
+# Build configuration
+[build]
+command = "npm run build"
+
+# Environment variables (add your production env vars here)
+[env.production]
+
+# Preview environment
+[env.preview]

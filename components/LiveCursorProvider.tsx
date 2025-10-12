@@ -4,7 +4,7 @@ import { useMyPresence , useOthers } from '@liveblocks/react/suspense'
 import FollowPointer from './FollowPointer'
 
 function LiveCursorProvider({children}:{children:React.ReactNode}) {
-    const [myPresence , UpdateMyPresence] = useMyPresence();
+    const [, UpdateMyPresence] = useMyPresence();
     const others = useOthers();
 
     React.useEffect(() => {
@@ -17,9 +17,13 @@ function LiveCursorProvider({children}:{children:React.ReactNode}) {
             UpdateMyPresence({ cursor: null });
         }
 
-        window.addEventListener('pointermove', handleWindowPointerMove as any, { passive: true });
-        window.addEventListener('pointerleave', handleWindowPointerLeave as any);
-        window.addEventListener('blur', handleWindowPointerLeave as any);
+        const pointerMoveHandler = handleWindowPointerMove as EventListener;
+        const pointerLeaveHandler = handleWindowPointerLeave as EventListener;
+        const blurHandler = handleWindowPointerLeave as EventListener;
+
+        window.addEventListener('pointermove', pointerMoveHandler, { passive: true });
+        window.addEventListener('pointerleave', pointerLeaveHandler);
+        window.addEventListener('blur', blurHandler);
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState !== 'visible') {
                 handleWindowPointerLeave();
@@ -27,9 +31,9 @@ function LiveCursorProvider({children}:{children:React.ReactNode}) {
         });
 
         return () => {
-            window.removeEventListener('pointermove', handleWindowPointerMove as any);
-            window.removeEventListener('pointerleave', handleWindowPointerLeave as any);
-            window.removeEventListener('blur', handleWindowPointerLeave as any);
+            window.removeEventListener('pointermove', pointerMoveHandler);
+            window.removeEventListener('pointerleave', pointerLeaveHandler);
+            window.removeEventListener('blur', blurHandler);
         };
     }, [UpdateMyPresence]);
 

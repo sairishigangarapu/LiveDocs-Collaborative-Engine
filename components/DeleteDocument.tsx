@@ -1,7 +1,6 @@
 'use client'
 import React, { useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { useParams } from 'next/navigation'
 import {
     Dialog,
     DialogClose,
@@ -19,9 +18,7 @@ import { toast } from 'sonner'
 
 function DeleteDocument() {
   const router = useRouter()
-  const params = useParams()
   const [isDeleting, startTransition] = useTransition()
-  const docId = params.id as string
   const [isOpen , setIsOpen] = useState(false)
   const pathname = usePathname();
 

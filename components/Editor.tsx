@@ -8,6 +8,8 @@ import { MoonIcon, SunIcon } from 'lucide-react';
 import {BlockNoteView} from "@blocknote/shadcn"
 // import {BlockNoteEditor} from "@blocknote/core"
 import {useCreateBlockNote} from "@blocknote/react"
+import TranslateDocument from './TranslateDocument'
+import ChatToDocument from './ChatToDocument'
 
 // BlockNote CSS imports
 import "@blocknote/core/fonts/inter.css"
@@ -161,9 +163,9 @@ function Editor() {
         <div className='max-w-6xl mx-auto'>
             <div className='flex items-center gap-2 justify-end'>
                 {/* Translation of document */}
-
+                <TranslateDocument doc = {doc} />
                 {/* ChatToCocument*/}
-
+                <ChatToDocument doc={doc}/>
                 {/* DarkMode*/}
                 <Button 
                     className={style} 

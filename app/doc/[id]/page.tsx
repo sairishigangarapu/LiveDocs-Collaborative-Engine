@@ -4,7 +4,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 export default async function DocumentPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 

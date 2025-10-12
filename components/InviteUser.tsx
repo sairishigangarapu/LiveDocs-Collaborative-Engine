@@ -1,13 +1,10 @@
 'use client'
 import React, { FormEvent, useState, useTransition } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import { useParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -19,11 +16,8 @@ import { Input } from './ui/input'
 
 
 function InviteUser() {
-  const router = useRouter()
-  const params = useParams()
   const [isPending, startTransition] = useTransition()
   const [email,setEmail] = useState("")
-  const docId = params.id as string
   const [isOpen , setIsOpen] = useState(false)
   const pathname = usePathname();
 
