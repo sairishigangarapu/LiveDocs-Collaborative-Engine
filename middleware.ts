@@ -1,43 +1,30 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Public routes that don't require authentication
-  const publicRoutes = ['/', '/sign-in', '/sign-up'];
-  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith('/api/auth'));
-  
-  if (isPublicRoute) {
-    return NextResponse.next();
+// Define public routes that don't require authentication
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/api/webhook(.*)',
+]);
+
+// Use Clerk's built-in middleware (Edge Runtime compatible)
+export default clerkMiddleware((auth, request) => {
+  // Public routes are accessible to everyone
+  if (isPublicRoute(request)) {
+    return;
   }
   
-  // Protected routes - check for Clerk session cookies
-  // Clerk uses multiple cookie strategies depending on the domain setup
-  const clerkSession = request.cookies.get('__session')?.value || 
-                       request.cookies.get('__clerk_db_jwt')?.value ||
-                       // Development mode cookie
-                       Array.from(request.cookies.getAll()).some(
-                         cookie => cookie.name.startsWith('__client_uat')
-                       );
-  
-  if (!clerkSession) {
-    // Redirect to home page if no Clerk session cookie found
-    const url = new URL('/', request.url);
-    url.searchParams.set('redirect', pathname); // Preserve intended destination
-    return NextResponse.redirect(url);
-  }
-  
-  // Note: Full JWT validation happens server-side in:
-  // - Server Actions (via await auth())
-  // - API Routes (via await auth())
-  // - Page Layouts (via await auth())
-  return NextResponse.next();
-}
+  // For protected routes, Clerk automatically handles authentication
+  // If user is not authenticated, they'll be redirected to sign-in
+  auth().protect();
+});
 
 export const config = {
   matcher: [
+    // Skip Next.js internals and all static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
     '/(api|trpc)(.*)',
   ],
 };
