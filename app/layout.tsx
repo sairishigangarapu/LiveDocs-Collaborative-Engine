@@ -31,7 +31,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <Header className="flex justify-end items-center p-4 gap-4 h-16"/>
+          <Header className="flex justify-between items-center p-4 gap-4 h-16"/>
           <div className='flex h-[calc(100vh-4rem)]'>
             {/*Sidebar */}
             <Sidebar/>

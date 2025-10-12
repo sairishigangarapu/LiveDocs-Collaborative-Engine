@@ -12,7 +12,7 @@ interface HeaderProps {
 function Header({children, className}: HeaderProps) {
     const {user} = useUser();
     return (
-        <div className={className || "flex items-center justify-between p-5"}>{
+        <div className={className || "flex items-center justify-between p-5 gap-2"}>{
                 user && (
                     <h1 className='text-2xl'>{user.firstName}{`'s`} Space</h1>
                 )

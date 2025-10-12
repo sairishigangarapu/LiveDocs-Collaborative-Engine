@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  serverExternalPackages: ['@clerk/backend'], // Moved from experimental
   // Suppress source map warnings for external dependencies
   productionBrowserSourceMaps: false,
   
@@ -31,6 +32,16 @@ const nextConfig: NextConfig = {
         /Failed to parse source map/,
         /Critical dependency: the request of a dependency is an expression/,
       ];
+    }
+    
+    // Fix for Clerk Edge Runtime compatibility
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        crypto: false,
+        stream: false,
+        buffer: false,
+      };
     }
     
     return config;
