@@ -537,7 +537,12 @@ export async function deleteDocument(docId: string): Promise<DeleteDocumentResul
 }
 
 export async function inviteUserToDocument(roomId:string,email:string){
-    auth.protect()
+    const { userId } = await auth();
+    if (!userId) {
+        console.error('❌ [inviteUserToDocument] User not authenticated');
+        return { success: false, error: "Unauthorized" };
+    }
+    
     console.log("📨 [inviteUserToDocument] Starting invite process for:", email, "to room:", roomId)
 
     try{

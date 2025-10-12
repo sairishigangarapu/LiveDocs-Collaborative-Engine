@@ -1,1 +1,7 @@
-{}
+{
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "env": {
+    "CLERK_TELEMETRY_DISABLED": "1"
+  }
+}

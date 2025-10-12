@@ -1,22 +1,16 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { authMiddleware } from '@clerk/nextjs/server';
 
-// Define protected routes
-const isProtectedRoute = createRouteMatcher([
-  '/doc(.*)',
-]);
-
-export default clerkMiddleware((auth, req) => {
-  // Protect specific routes
-  if (isProtectedRoute(req)) {
-    auth.protect();
-  }
+export default authMiddleware({
+  // Routes that can be accessed while signed out
+  publicRoutes: ['/', '/api/auth(.*)'],
+  // Routes that require authentication
+  // By default, all routes not in publicRoutes are protected
+  // The /doc routes will require authentication
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
     '/(api|trpc)(.*)',
   ],
 };

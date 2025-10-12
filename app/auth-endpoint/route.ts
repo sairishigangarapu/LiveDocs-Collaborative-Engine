@@ -10,8 +10,15 @@ interface SessionClaims {
 }
 
 export async function POST(req:NextRequest) {
-	auth.protect();
 	const { userId, sessionClaims } = await auth();
+	
+	if (!userId) {
+		return NextResponse.json(
+			{ message: "Unauthorized" },
+			{ status: 401 }
+		);
+	}
+	
 	const {room} = await req.json();
 
 	const claims = sessionClaims as SessionClaims;
