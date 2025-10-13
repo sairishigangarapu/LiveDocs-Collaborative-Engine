@@ -1,24 +1,36 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-// Define public routes that don't require authentication
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/api/webhook(.*)',
-]);
-
-// Use Clerk's built-in middleware (Edge Runtime compatible)
-export default clerkMiddleware((auth, request) => {
-  // Public routes are accessible to everyone
-  if (isPublicRoute(request)) {
-    return;
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // Public routes that don't require authentication
+  const publicRoutes = ['/', '/sign-in', '/sign-up'];
+  const isPublicRoute = publicRoutes.includes(pathname) || 
+                        pathname.startsWith('/api/auth') ||
+                        pathname.startsWith('/sign-in') ||
+                        pathname.startsWith('/sign-up');
+  
+  if (isPublicRoute) {
+    return NextResponse.next();
   }
   
-  // For protected routes, Clerk automatically handles authentication
-  // If user is not authenticated, they'll be redirected to sign-in
-  auth().protect();
-});
+  // For protected routes, check for any Clerk session cookie
+  // Clerk sets __session in production, __clerk_db_jwt for dev
+  const hasClerkSession = request.cookies.has('__session') || 
+                          request.cookies.has('__clerk_db_jwt');
+  
+  if (!hasClerkSession) {
+    // Redirect to home page if no session found
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
+  }
+  
+  // Full authentication is verified server-side via auth()
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
