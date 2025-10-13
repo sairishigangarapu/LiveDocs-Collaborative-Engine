@@ -1,34 +1,8 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Public routes that don't require authentication
-  const publicRoutes = ['/', '/sign-in', '/sign-up'];
-  const isPublicRoute = publicRoutes.includes(pathname) || 
-                        pathname.startsWith('/api/auth') ||
-                        pathname.startsWith('/sign-in') ||
-                        pathname.startsWith('/sign-up');
-  
-  if (isPublicRoute) {
-    return NextResponse.next();
-  }
-  
-  // For protected routes, check for any Clerk session cookie
-  // Clerk sets __session in production, __clerk_db_jwt for dev
-  const hasClerkSession = request.cookies.has('__session') || 
-                          request.cookies.has('__clerk_db_jwt');
-  
-  if (!hasClerkSession) {
-    // Redirect to home page if no session found
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
-    url.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(url);
-  }
-  
-  // Full authentication is verified server-side via auth()
+// Minimal middleware - just pass through
+// Let Clerk handle authentication in pages via auth()
+export function middleware() {
   return NextResponse.next();
 }
 
