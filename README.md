@@ -142,7 +142,6 @@ Visit `http://localhost:3000` to start editing.
 
 This project is open-source and available under the [MIT License](https://www.google.com/search?q=LICENSE).
 
----
 
 **Author:** [Sai Rishi Gangarapu](https://github.com/sairishigangarapu)
 
