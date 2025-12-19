@@ -1,5 +1,4 @@
 
-```markdown
 # 📝 LiveDocs - Collaborative Workspace Engine
 
 ### Real-Time Document Editor with Recursive Nesting & Optimistic Sync
