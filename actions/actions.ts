@@ -52,7 +52,7 @@ export async function createNewDocument(): Promise<CreateDocumentResult> {
     try {
         console.log('🚀 Starting document creation...');
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         console.log('🔍 Auth check:', { 
@@ -178,7 +178,7 @@ export async function getDocument(docId: string): Promise<GetDocumentResult> {
     try {
         console.log('🔍 Fetching document:', docId);
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         if (!userId || !sessionClaims?.email) {
@@ -250,7 +250,7 @@ export async function updateDocument(docId: string, updates: Partial<DocumentDat
     try {
         console.log('📝 Updating document:', docId, updates);
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         if (!userId || !sessionClaims?.email) {
@@ -329,7 +329,7 @@ export async function getUserDocuments(): Promise<GetUserDocumentsResult> {
     try {
         console.log('🔍 Fetching user documents...');
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         if (!userId || !sessionClaims?.email) {
@@ -428,7 +428,7 @@ export async function deleteDocument(docId: string): Promise<DeleteDocumentResul
     try {
         console.log('🗑️ Deleting document:', docId);
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         if (!userId || !sessionClaims?.email) {
@@ -537,6 +537,7 @@ export async function deleteDocument(docId: string): Promise<DeleteDocumentResul
 }
 
 export async function inviteUserToDocument(roomId:string,email:string){
+    // auth() is async in Clerk v6
     const { userId } = await auth();
     if (!userId) {
         console.error('❌ [inviteUserToDocument] User not authenticated');
@@ -644,7 +645,7 @@ export async function removeUserFromDocument(roomId: string, emailToRemove: stri
     try {
         console.log('🗑️ [removeUserFromDocument] Removing user:', emailToRemove, 'from room:', roomId);
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         if (!userId || !sessionClaims?.email) {
@@ -737,7 +738,7 @@ export async function getRoomUsers(roomId: string): Promise<GetRoomUsersResult> 
     try {
         console.log('🔍 [getRoomUsers] Starting fetch for room:', roomId);
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         console.log('🔍 [getRoomUsers] Auth details:', {
@@ -861,7 +862,7 @@ export async function checkRoomOwnership(roomId: string): Promise<CheckRoomOwner
     try {
         console.log('🔍 Checking room ownership:', roomId);
         
-        // Validate user authentication
+        // Validate user authentication - auth() is async in Clerk v6
         const { userId, sessionClaims } = await auth();
         
         if (!userId || !sessionClaims?.email) {

@@ -10,6 +10,7 @@ interface SessionClaims {
 }
 
 export async function POST(req:NextRequest) {
+	// auth() is async in Clerk v6
 	const { userId, sessionClaims } = await auth();
 	
 	if (!userId) {

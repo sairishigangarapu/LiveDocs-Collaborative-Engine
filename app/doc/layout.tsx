@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import LiveBlocksProvider from '@/components/LiveBlocksProvider';
 
 async function PageLayout({children}:{children:React.ReactNode}) {
-  // Server-side authentication check
+  // Server-side authentication check - auth() is async in Clerk v6
   const { userId } = await auth();
   
   if (!userId) {

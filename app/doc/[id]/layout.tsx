@@ -7,6 +7,7 @@ async function DocLayout({children, params}:
     {children:React.ReactNode,
     params: Promise<{id:string}>}) 
 {
+    // auth() is async in Clerk v6
     const { userId } = await auth();
     if (!userId) {
         redirect('/');

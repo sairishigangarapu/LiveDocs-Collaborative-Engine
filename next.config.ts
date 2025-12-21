@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
   // Suppress source map warnings for external dependencies
   productionBrowserSourceMaps: false,
   
+  // Suppress specific development warnings
+  logging: {
+    fetches: {
+      fullUrl: false,
+    },
+  },
+  
   webpack: (config, { isServer, dev }) => {
     // Disable source maps for node_modules in development to prevent 404s
     if (dev && !isServer) {

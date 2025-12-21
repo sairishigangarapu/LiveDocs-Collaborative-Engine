@@ -19,7 +19,7 @@
     "@blocknote/mantine": "^0.40.0",
     "@blocknote/react": "^0.40.0",
     "@blocknote/shadcn": "^0.40.0",
-    "@clerk/nextjs": "^5.7.5",
+    "@clerk/nextjs": "^6.30.0",
     "@liveblocks/client": "^3.8.0",
     "@liveblocks/node": "^3.8.0",
     "@liveblocks/react": "^3.8.0",
