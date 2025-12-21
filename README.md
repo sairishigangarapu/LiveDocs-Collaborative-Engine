@@ -94,6 +94,40 @@ flowchart TB
 
 ---
 
+ Cloudflare Workers Setup (Optional - For Edge Functions)
+If you are deploying the collaborative backend to the Edge:
+
+**1. Install Wrangler CLI**
+```bash
+npm install -g wrangler
+
+```
+
+**2. Authenticate**
+
+```bash
+npx wrangler login
+
+```
+
+**3. Configure `wrangler.toml**`
+Ensure your `wrangler.toml` file has the correct project details:
+
+```toml
+name = "livedocs-worker"
+compatibility_date = "2024-01-01"
+
+```
+
+**4. Deploy to Edge**
+
+```bash
+npx wrangler deploy
+
+```
+
+The console will output your worker's URL (e.g., `https://livedocs-worker.yourname.workers.dev`). Update your `.env.local` with this URL if your frontend consumes it.
+---
 ## 📚 The Stack: Why Each Technology?
 
 | Technology | Purpose | Engineering Justification |
