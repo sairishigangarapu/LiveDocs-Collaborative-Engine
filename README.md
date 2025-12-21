@@ -28,30 +28,39 @@ The system utilizes a **serverless architecture** to handle scaling and real-tim
 ```mermaid
 flowchart TB
     subgraph Client ["🖥️ Client (Next.js 14)"]
-        UI[Rich Text Editor UI]
-        LocalState[Optimistic State]
-        Auth_C[Clerk Auth SDK]
+        direction TB
+        UI[("Rich Text Editor UI")]
+        LocalState[("Optimistic Local State")]
+        Auth_SDK["Clerk Auth SDK"]
     end
 
-    subgraph Backend ["☁️ Managed Services"]
-        Fire_DB[(Firebase Firestore)]
-        Fire_Live[Real-Time Listeners]
-        Clerk_S[Clerk Auth Server]
+    subgraph Infrastructure ["☁️ Serverless Infrastructure"]
+        direction TB
+        Clerk_API["🛡️ Clerk Identity Provider"]
+        Firestore[("🔥 Firebase Firestore")]
+        SecurityRules["Security Rules (RBAC)"]
     end
 
-    %% Auth Flow
-    Auth_C -->|Authenticate| Clerk_S
-    Clerk_S -->|Verify Token| Fire_DB
-
-    %% Write Flow
-    UI -->|User Types| LocalState
-    LocalState -->|Immediate Render| UI
-    LocalState -->|Async Write| Fire_DB
+    %% Authentication Flow
+    Auth_SDK -->|1. Authenticate & Get Token| Clerk_API
+    Clerk_API --2. JWT Token--> Auth_SDK
+    
+    %% Write Flow (Optimistic)
+    UI -->|3. User types (Keystroke)| LocalState
+    LocalState -->|4. Immediate UI Update| UI
+    LocalState -.->|5. Async Write + Token| Firestore
 
     %% Read/Sync Flow
-    Fire_DB -->|Doc Change Event| Fire_Live
-    Fire_Live -->|Push Snapshot| LocalState
-    LocalState -->|Reconcile & Update| UI
+    Firestore -->|6. Validate Token| SecurityRules
+    SecurityRules -->|7. Persist Data| Firestore
+    Firestore ==8. Real-Time Listener (WebSocket)==> LocalState
+
+    %% Styling
+    classDef client fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef cloud fill:#fff3e0,stroke:#ff6f00,stroke-width:2px;
+    
+    class UI,LocalState,Auth_SDK client;
+    class Clerk_API,Firestore,SecurityRules cloud;
 
 ```
 
