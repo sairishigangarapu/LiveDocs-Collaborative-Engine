@@ -29,8 +29,8 @@ The system utilizes a **serverless architecture** to handle scaling and real-tim
 flowchart TB
     subgraph Client ["🖥️ Client (Next.js 14)"]
         direction TB
-        UI[("Rich Text Editor UI")]
-        LocalState[("Optimistic Local State")]
+        UI("Rich Text Editor UI")
+        LocalState("Optimistic Local State")
         Auth_SDK["Clerk Auth SDK"]
     end
 
@@ -42,18 +42,18 @@ flowchart TB
     end
 
     %% Authentication Flow
-    Auth_SDK -->|1. Authenticate & Get Token| Clerk_API
-    Clerk_API --2. JWT Token--> Auth_SDK
+    Auth_SDK -- "1. Authenticate & Get Token" --> Clerk_API
+    Clerk_API -- "2. JWT Token" --> Auth_SDK
     
     %% Write Flow (Optimistic)
-    UI -->|3. User types (Keystroke)| LocalState
-    LocalState -->|4. Immediate UI Update| UI
-    LocalState -.->|5. Async Write + Token| Firestore
+    UI -- "3. User types (Keystroke)" --> LocalState
+    LocalState -- "4. Immediate UI Update" --> UI
+    LocalState -. "5. Async Write + Token" .-> Firestore
 
     %% Read/Sync Flow
-    Firestore -->|6. Validate Token| SecurityRules
-    SecurityRules -->|7. Persist Data| Firestore
-    Firestore ==8. Real-Time Listener (WebSocket)==> LocalState
+    Firestore -- "6. Validate Token" --> SecurityRules
+    SecurityRules -- "7. Persist Data" --> Firestore
+    Firestore == "8. Real-Time Listener (WebSocket)" ==> LocalState
 
     %% Styling
     classDef client fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
