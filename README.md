@@ -127,6 +127,7 @@ npx wrangler deploy
 ```
 
 The console will output your worker's URL (e.g., `https://livedocs-worker.yourname.workers.dev`). Update your `.env.local` with this URL if your frontend consumes it.
+
 ---
 ## 📚 The Stack: Why Each Technology?
 
